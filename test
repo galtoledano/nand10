@@ -1,0 +1,13 @@
+class Test{
+    constructor void Test {
+        var int x = 1;
+        var string y = "day off";
+    }
+
+    function void try {
+        if(x<3):
+            return True
+        else:
+            let y = "ho no !";
+    }
+}
