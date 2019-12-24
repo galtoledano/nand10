@@ -1,6 +1,6 @@
 import Tokenizer
 import CompilationEngine
-file = "test2"
+file = "test2.jack"
 
 # t = Tokenizer.Tokenizer(file)
 f = CompilationEngine.CompilationEngine(file, "out")

@@ -3,6 +3,7 @@ from Tokenizer import Tokenizer
 
 class CompilationEngine:
     XML_LINE = "<{0}> {1} </{0}> \n"
+    COMPARE_SYM_REPLACER = {'<': "&lt;", '>': "&gt;", '"': "&quot;", '&': "&amp;"}
 
     def __init__(self, input_stream, output_stream):
         """
@@ -11,20 +12,22 @@ class CompilationEngine:
         :param output_stream:
         """
         self.__tokenizer = Tokenizer(input_stream)  # Tokenizer object
-        self.__output = open(output_stream + ".xml", "w")
+        self.__output = open(output_stream , "w")
         self.__statements = {"let": self.compile_let, "if": self.compile_if, "while": self.compile_while,
-                      "do": self.compile_do, "return": self.compile_return, "}": self.empty_state}
+                      "do": self.compile_do, "return": self.compile_return}
         self.__keyword_constant = ("true", "false", "null", "this")
         self.compile_class()
+        self.__output.close()
 
     def write_xml(self):
-        self.__output.write(self.XML_LINE.format(self.__tokenizer.token_type(), self.__tokenizer.get_value()))
+        if self.__tokenizer.token_type() == "stringConstant":
+            self.__output.write(self.XML_LINE.format(self.__tokenizer.token_type(), self.__tokenizer.string_val()))
+        elif self.__tokenizer.get_value() in self.COMPARE_SYM_REPLACER:
+            xml_val = self.COMPARE_SYM_REPLACER[self.__tokenizer.get_value()]
+            self.__output.write(self.XML_LINE.format(self.__tokenizer.token_type(), xml_val))
+        else:
+            self.__output.write(self.XML_LINE.format(self.__tokenizer.token_type(), self.__tokenizer.get_value()))
 
-    def empty_state(self):
-        """
-        handle with empty statement
-        """
-        pass
 
     def compile_class(self):
         self.__output.write("<class>\n")
@@ -67,9 +70,9 @@ class CompilationEngine:
 
     def compile_subroutine_body(self):
         self.__output.write("<subroutineBody>\n")
-        self.write_xml() # write {
+        self.write_xml()  # write {
         self.__tokenizer.advance()
-        if self.__tokenizer.get_value() == "var":
+        while self.__tokenizer.get_value() == "var":
             self.compile_var_dec()
         self.compile_statements()
         self.write_xml()  # write }
@@ -92,16 +95,18 @@ class CompilationEngine:
         self.write_xml()  # write (
         self.__tokenizer.advance()
         self.__output.write("<parameterList>\n")
-        self.write_xml()  # write type
-        self.__tokenizer.advance()
-        self.write_xml()  # write varName
-        self.__tokenizer.advance()
-        while self.__tokenizer.get_value() == ",":
-            self.__tokenizer.advance()  # todo need to write , ?
-            self.write_xml()  # type
+        if self.__tokenizer.get_value() != ")":
+            self.write_xml()  # write type
             self.__tokenizer.advance()
-            self.write_xml()  # varName
+            self.write_xml()  # write varName
             self.__tokenizer.advance()
+            while self.__tokenizer.get_value() == ",":
+                self.write_xml()  # write ,
+                self.__tokenizer.advance()
+                self.write_xml()  # type
+                self.__tokenizer.advance()
+                self.write_xml()  # varName
+                self.__tokenizer.advance()
         self.__output.write("</parameterList>\n")
         self.write_xml()  # write )
         self.__tokenizer.advance()
@@ -115,7 +120,8 @@ class CompilationEngine:
         self.write_xml()  # write varName
         self.__tokenizer.advance()
         while self.__tokenizer.get_value() == ",":
-            self.__tokenizer.advance()  # todo need to write , ?
+            self.write_xml() # write ,
+            self.__tokenizer.advance()
             self.write_xml()
             self.__tokenizer.advance()
         self.write_xml()  # write ;
@@ -123,12 +129,18 @@ class CompilationEngine:
         self.__output.write("</varDec>\n")
 
     def compile_statements(self):
+        key = self.__tokenizer.get_value()
         self.__output.write("<statements>\n")
-        self.__statements[self.__tokenizer.get_value()]()
+        if key != "}":
+            while key in self.__statements:
+                self.__statements[self.__tokenizer.get_value()]()
+                key = self.__tokenizer.get_value()
         self.__output.write("</statements>\n")
 
     def compile_do(self):
         self.__output.write("<doStatement>\n")
+        self.write_xml()  # write do
+        self.__tokenizer.advance()
         self.subroutine_call()
         self.write_xml()  # write ;
         self.__tokenizer.advance()
@@ -141,7 +153,11 @@ class CompilationEngine:
         self.write_xml()  # write varName
         self.__tokenizer.advance()
         if self.__tokenizer.get_value() == "[":
-            self.compile_expression()  # todo add the [ outside ?
+            self.write_xml()  # write [
+            self.__tokenizer.advance()
+            self.compile_expression()
+            self.write_xml()  # write ]
+            self.__tokenizer.advance()
         self.write_xml()  # write =
         self.__tokenizer.advance()
         self.compile_expression()
@@ -150,7 +166,7 @@ class CompilationEngine:
         self.__output.write("</letStatement>\n")
 
     def compile_while(self):
-        self.__output.write("<while>\n")  # todo whileStatement ?
+        self.__output.write("<whileStatement>\n")  # todo whileStatement ?
         self.write_xml()  # write while
         self.__tokenizer.advance()
         self.write_xml()  # write (
@@ -163,17 +179,17 @@ class CompilationEngine:
         self.compile_statements()
         self.write_xml()  # write }
         self.__tokenizer.advance()
-        self.__output.write("</while>\n")
+        self.__output.write("</whileStatement>\n")
 
     def compile_return(self):
-        self.__output.write("<return>\n")
+        self.__output.write("<returnStatement>\n")
         self.write_xml()  # write return
         self.__tokenizer.advance()
         if self.__tokenizer.get_value() != ";":
             self.compile_expression()  # todo not writing ;
         self.write_xml()  # write ;
         self.__tokenizer.advance()
-        self.__output.write("</return>\n")
+        self.__output.write("</returnStatement>\n")
 
     def compile_if(self):
         self.__output.write("<if>\n")
@@ -225,7 +241,7 @@ class CompilationEngine:
 
         elif curr_type == "identifier":
             # handle var names
-            if self.__tokenizer.get_next_token() != "(":
+            if self.__tokenizer.get_next_token() != "(" and self.__tokenizer.get_next_token() != ".":
                 self.write_xml()  # write the var name
                 self.__tokenizer.advance()
                 if self.__tokenizer.get_value() == "[":
@@ -268,9 +284,10 @@ class CompilationEngine:
 
     def compile_expression_list(self):
         self.__output.write("<expressionList>\n")
-        if self.__tokenizer.get_next_token() != ")":
+        if self.__tokenizer.get_value() != ")":
             self.compile_expression()
             while self.__tokenizer.get_value() == ",":
+                self.write_xml()  # write ,
                 self.__tokenizer.advance()
                 self.compile_expression()
         self.__output.write("</expressionList>\n")

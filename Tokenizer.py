@@ -97,13 +97,13 @@ class Tokenizer:
             return "symbol"
         elif self.__current_token.isdigit():
             return "integerConstant"
-        elif self.__current_token[0] == '"' and self.__current_token[-1] == '"':
+        elif self.__current_token[0] == '"' and self.__current_token[-2] == '"':
             return "stringConstant"
         else:
             return "identifier"
 
     def get_next_token(self):
-        return self.__file[self.__index + 1]
+        return self.__file[self.__index]
 
     def set_type(self, new_type):
         self.__current_token_type = new_type
@@ -123,7 +123,7 @@ class Tokenizer:
         return int(self.__current_token)
 
     def string_val(self):
-        return str(self.__current_token[1:-1])
+        return str(self.__current_token[1:-2])
 
     def is_operator(self):
         return self.__current_token in self.operators
