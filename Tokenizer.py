@@ -103,27 +103,52 @@ class Tokenizer:
             return "identifier"
 
     def get_next_token(self):
+        """
+        getter to the next token
+        :return: the next token's value
+        """
         return self.__file[self.__index]
 
     def set_type(self, new_type):
+        """
+        set the token's type
+        :param new_type: a new type to set
+        """
         self.__current_token_type = new_type
 
     def keyword(self):
+        """
+        :return: the keybord value
+        """
         return str(self.__current_token)
 
     def symbol(self):
-        # return char
+        """
+        :return: the symbol's char
+        """
         return chr(self.__current_token)
 
     def identifier(self):
-        # returns string
+        """
+        :return: the identifier
+        """
         return str(self.__current_token)
 
     def int_val(self):
+        """
+        :return: the int value
+        """
         return int(self.__current_token)
 
     def string_val(self):
+        """
+        :return: a string value
+        """
         return str(self.__current_token[1:-2])
 
     def is_operator(self):
+        """
+        checks if the current token is operator or not
+        :return: true is it is a operator, flase is not
+        """
         return self.__current_token in self.operators
