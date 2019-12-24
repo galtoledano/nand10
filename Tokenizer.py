@@ -5,6 +5,7 @@ class Tokenizer:
     keyWords = ("class", "constructor", "function", "method", "field", "static", "var", "int", "char",
                 "boolean", "void", "true", "false", "null", "this", "let", "do", "if", "else", "while", "return")
     symbols = ("(", ")", "{", "}", "[", "]", ".", ",", ";", "+", "-", "*", "/", "&", "|", "<", ">", "=", "~")
+    operators = ("+", "-", "*", "/", "&", "|", "<", ">", "=")
 
     def __init__(self, file):
         self.__file = []
@@ -95,11 +96,17 @@ class Tokenizer:
         elif self.__current_token in self.symbols:
             return "symbol"
         elif self.__current_token.isdigit():
-            return "intval"
+            return "integerConstant"
         elif self.__current_token[0] == '"' and self.__current_token[-1] == '"':
-            return "stringval"
+            return "stringConstant"
         else:
             return "identifier"
+
+    def get_next_token(self):
+        return self.__file[self.__index + 1]
+
+    def set_type(self, new_type):
+        self.__current_token_type = new_type
 
     def keyword(self):
         return str(self.__current_token)
@@ -118,37 +125,5 @@ class Tokenizer:
     def string_val(self):
         return str(self.__current_token[1:-1])
 
-    def find_string2(self):
-        lst = self.__file
-        is_word = False
-        temp = ""
-        counter = 0
-        i = 0
-        while i < len(lst):
-            x = lst[i]
-            if is_word:
-                temp += lst[i] + " "
-                counter += 1
-                if lst[i].endswith('"'):
-                    is_word = False
-                    i = i + counter
-                    self.__file = self.__file[:index] + [temp] + self.__file[i:]
-                    counter = 0
-                else:
-                    i += 1
-
-            else:
-                if lst[i].startswith('"'):
-                    is_word = True
-                    index = i
-                    temp = lst[i] + " "
-                i += 1
-        print(self.__file)
-
-        def __remove_invalid_syntax2(self, line):  # todo change !
-            if str(os.path.sep) in line:
-                index = line.find(str(os.path.sep))
-                line = line[:index]
-            line = line.replace("\n", "")
-            line = line.rstrip()
-            return line
+    def is_operator(self):
+        return self.__current_token in self.operators
