@@ -8,18 +8,21 @@ class CompilationEngine:
 
     def __init__(self, input_stream, output_stream):
         """
-
-        :param input_stream:
-        :param output_stream:
+        constructor of the Compilation Engine object
+        :param input_stream: the input stream
+        :param output_stream: the output stream
         """
         self.__tokenizer = Tokenizer(input_stream)  # Tokenizer object
-        self.__output = open(output_stream , "w")
+        self.__output = open(output_stream, "w")
         self.__statements = {"let": self.compile_let, "if": self.compile_if, "while": self.compile_while,
-                      "do": self.compile_do, "return": self.compile_return}
+                             "do": self.compile_do, "return": self.compile_return}
         self.compile_class()
         self.__output.close()
 
     def write_xml(self):
+        """
+        writing xml line
+        """
         if self.__tokenizer.token_type() == "stringConstant":
             self.__output.write(self.XML_LINE.format(self.__tokenizer.token_type(), self.__tokenizer.string_val()))
         elif self.__tokenizer.get_value() in self.COMPARE_SYM_REPLACER:
