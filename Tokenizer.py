@@ -12,20 +12,41 @@ class Tokenizer:
         self.__current_token = None
         self.__current_token_type = None
         self.__read_file(file)
+        print(self.__file)
 
-    def __remove_invalid_syntax(self, line):
-        if str(os.path.sep) in line:
-            index = line.find(str(os.path.sep))
-            line = line[:index]
-        line = line.replace("\n", "")
-        line = line.rstrip()
-        return line
+    def __remove_invalid_syntax(self, line, is_comment):
+        """
+        removing comments and empty lines from the text file
+        :param line: single line to process
+        :param is_comment: flag that indicates if the line is at the middle of multi line comment or not
+        :return: the processed line and the in multi line comment flag
+        """
+        # removing comments
+        newLine = line.strip()
+        newLine = newLine.split("//")[0]
+
+        # removing multi lines comments
+        prefix = newLine[:2]
+        suffix = newLine[-2:]
+        if prefix == "/*":
+            is_comment = True
+        if prefix == "*/" or suffix == "*/":
+            newLine = ""
+            is_comment = False
+        if is_comment:
+            newLine = ""
+        return newLine, is_comment
 
     def __read_file(self, original_file):
+        """
+        reading the text file and convert it to array
+        :param original_file: the program's test file to read
+        """
         file = open(original_file, 'r')
         line = file.readline()
+        is_comment = False
         while line:
-            current_line = self.__remove_invalid_syntax(line)
+            current_line, is_comment = self.__remove_invalid_syntax(line, is_comment)
             if current_line != "":
                 # add spaces between symbols
                 for char in current_line:
@@ -41,7 +62,6 @@ class Tokenizer:
         is_word = False
         temp = ""
         for i in range(len(self.__file)):
-            x = self.__file[i]
             if is_word:
                 temp += self.__file[i] + " "
                 if self.__file[i].endswith('"'):
@@ -54,25 +74,15 @@ class Tokenizer:
                 else:
                     final_file.append(self.__file[i])
         self.__file = final_file
-        print(self.__file)
 
     def has_more_tokens(self):
         if self.__index != len(self.__file) - 1:
             return True
-        if len(self.__current_token) == 1 and self.__current_token == "}": #todo check that it not hidding bags
-            return False
-        return True
 
     def advance(self):
-        check = self.__file[self.__index]
-        if check in self.keyWords or check in self.symbols:
-            self.__current_token = check
-        elif check[0] in self.symbols:
-            temp1 = check[0]
-            temp2 = check[1:]
-
+        self.__current_token = self.__file[self.__index]
+        self.__current_token_type = self.token_type()
         self.__index += 1
-        self.token_type()
 
     def token_type(self):
         # returns the token's type.
@@ -102,8 +112,7 @@ class Tokenizer:
         return int(self.__current_token)
 
     def string_val(self):
-        return str(self.__current_token)
-
+        return str(self.__current_token[1:-1])
 
     def find_string2(self):
         lst = self.__file
@@ -131,3 +140,11 @@ class Tokenizer:
                     temp = lst[i] + " "
                 i += 1
         print(self.__file)
+
+        def __remove_invalid_syntax2(self, line):  # todo change !
+            if str(os.path.sep) in line:
+                index = line.find(str(os.path.sep))
+                line = line[:index]
+            line = line.replace("\n", "")
+            line = line.rstrip()
+            return line
