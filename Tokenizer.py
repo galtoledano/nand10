@@ -12,7 +12,7 @@ class Tokenizer:
         self.__current_token = None
         self.__current_token_type = None
         self.__read_file(file)
-        print(self.__file)
+        self.advance()
 
     def __remove_invalid_syntax(self, line, is_comment):
         """
@@ -75,25 +75,29 @@ class Tokenizer:
                     final_file.append(self.__file[i])
         self.__file = final_file
 
+    def get_value(self):
+        return self.__current_token
+
     def has_more_tokens(self):
-        if self.__index != len(self.__file) - 1:
+        if self.__index != len(self.__file):
             return True
 
     def advance(self):
-        self.__current_token = self.__file[self.__index]
-        self.__current_token_type = self.token_type()
-        self.__index += 1
+        if self.has_more_tokens():
+            self.__current_token = self.__file[self.__index]
+            self.__current_token_type = self.token_type()
+            self.__index += 1
 
     def token_type(self):
         # returns the token's type.
         if self.__current_token in self.keyWords:
-            return "keyWord"
+            return "keyword"
         elif self.__current_token in self.symbols:
             return "symbol"
         elif self.__current_token.isdigit():
-            return "intVal"
+            return "intval"
         elif self.__current_token[0] == '"' and self.__current_token[-1] == '"':
-            return "stringVal"
+            return "stringval"
         else:
             return "identifier"
 

@@ -1,5 +1,6 @@
-"hey! my name";
-return;
-};
-x = "yayy gal";
+class yahel{
+    filed int x, y;
+    function void gal(int x,int y,int z){
+    let x = 2;
+    }
 }
