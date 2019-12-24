@@ -2,8 +2,9 @@ from Tokenizer import Tokenizer
 
 
 class CompilationEngine:
-    XML_LINE = "<{0}> {1} </{0}> \n"
+    XML_LINE = "<{0}> {1} </{0}>\n"
     COMPARE_SYM_REPLACER = {'<': "&lt;", '>': "&gt;", '"': "&quot;", '&': "&amp;"}
+    KEYWORD_CONSTANT = ("true", "false", "null", "this")
 
     def __init__(self, input_stream, output_stream):
         """
@@ -15,7 +16,6 @@ class CompilationEngine:
         self.__output = open(output_stream , "w")
         self.__statements = {"let": self.compile_let, "if": self.compile_if, "while": self.compile_while,
                       "do": self.compile_do, "return": self.compile_return}
-        self.__keyword_constant = ("true", "false", "null", "this")
         self.compile_class()
         self.__output.close()
 
@@ -28,7 +28,6 @@ class CompilationEngine:
         else:
             self.__output.write(self.XML_LINE.format(self.__tokenizer.token_type(), self.__tokenizer.get_value()))
 
-
     def compile_class(self):
         self.__output.write("<class>\n")
         self.write_xml()
@@ -38,35 +37,34 @@ class CompilationEngine:
         self.write_xml()
         self.__tokenizer.advance()
         currToken = self.__tokenizer.get_value()
-        if currToken == "static" or currToken == "filed":
+        while currToken == "static" or currToken == "field":
             self.compile_class_var_dec()
-        currToken = self.__tokenizer.get_value()
-        if currToken == "constructor" or currToken == "function" or currToken == "method":
+            currToken = self.__tokenizer.get_value()
+        while currToken == "constructor" or currToken == "function" or currToken == "method":
             self.compile_subroutine_dec()
+            currToken = self.__tokenizer.get_value()
         self.write_xml()
-        self.__output.write("</class> \n")
+        self.__output.write("</class>\n")
 
     def compile_class_var_dec(self):
         currToken = self.__tokenizer.get_value()
-        self.__output.write("<classVarDec>\n")  # todo : ok ?
-        while currToken == "static" or currToken == "filed":
+        while currToken == "static" or currToken == "field":
+            self.__output.write("<classVarDec>\n")
             self.write_xml()
             self.__tokenizer.advance()
             self.write_xml()
             self.__tokenizer.advance()
             self.write_xml()
             self.__tokenizer.advance()
-
             while self.__tokenizer.get_value() == ",":
-                self.__tokenizer.advance()  # todo need to write , ?
-                self.write_xml()
+                self.write_xml()  # write ,
                 self.__tokenizer.advance()
-
+                self.write_xml()  # write value
+                self.__tokenizer.advance()
             self.write_xml()
             self.__tokenizer.advance()
             currToken = self.__tokenizer.get_value()
-
-        self.__output.write("</classVarDec>\n")
+            self.__output.write("</classVarDec>\n")
 
     def compile_subroutine_body(self):
         self.__output.write("<subroutineBody>\n")
@@ -192,7 +190,7 @@ class CompilationEngine:
         self.__output.write("</returnStatement>\n")
 
     def compile_if(self):
-        self.__output.write("<if>\n")
+        self.__output.write("<ifStatement>\n")
         self.write_xml()  # write if
         self.__tokenizer.advance()
         self.write_xml()  # write (
@@ -213,7 +211,7 @@ class CompilationEngine:
             self.compile_statements()
             self.write_xml()  # write }
             self.__tokenizer.advance()
-        self.__output.write("</if>\n")
+        self.__output.write("</ifStatement>\n")
 
     def compile_expression(self):
         self.__output.write("<expression>\n")
@@ -234,7 +232,7 @@ class CompilationEngine:
             self.__tokenizer.advance()
 
         # handle const keyword
-        elif curr_type == "keyword" and curr_type in self.__keyword_constant:
+        elif curr_type == "keyword" and self.__tokenizer.get_value() in self.KEYWORD_CONSTANT:
             self.__tokenizer.set_type("keywordConstant")
             self.write_xml()  # write key word
             self.__tokenizer.advance()
