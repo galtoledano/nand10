@@ -44,7 +44,7 @@ class Tokenizer:
         """
         # finding string indexing
         start_index = line.find('"')
-        if start_index != -1:
+        if start_index != -1 and not is_comment:
             end_index = line.find('"', start_index + 1, len(line))
             before_string = line[:start_index]
             the_string = line[start_index:end_index+1]
