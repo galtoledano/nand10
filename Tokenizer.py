@@ -74,8 +74,11 @@ class Tokenizer:
                     final_file.append(temp)
             else:
                 if self.__file[i].startswith('"'):
-                    is_word = True
-                    temp = self.__file[i] + " "
+                    if self.__file[i].endswith('"') and len(self.__file[i]) > 1:
+                        final_file.append(self.__file[i])
+                    else:
+                        is_word = True
+                        temp = self.__file[i] + " "
                 else:
                     final_file.append(self.__file[i])
         self.__file = final_file
@@ -106,13 +109,14 @@ class Tokenizer:
         :return: the current token's type
         """
         # returns the token's type.
-        if self.__current_token in self.keyWords:
+        temp_token = self.__current_token.strip()
+        if temp_token in self.keyWords:
             return "keyword"
-        elif self.__current_token in self.symbols:
+        elif temp_token in self.symbols:
             return "symbol"
-        elif self.__current_token.isdigit():
+        elif temp_token.isdigit():
             return "integerConstant"
-        elif self.__current_token[0] == '"' and self.__current_token[-2] == '"':
+        elif temp_token.startswith('"') and temp_token.endswith('"'):
             return "stringConstant"
         else:
             return "identifier"
@@ -159,7 +163,8 @@ class Tokenizer:
         """
         :return: a string value
         """
-        return str(self.__current_token[1:-2])
+        temp_token = self.__current_token.strip()
+        return str(temp_token[1:-1])
 
     def is_operator(self):
         """
