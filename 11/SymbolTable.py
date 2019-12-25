@@ -1,7 +1,7 @@
 class SymbolTable:
     def __init__(self):
-        self.__class_scoop = {}
-        self.__subroutine_scoop = {}
+        self.__class_scoop = {}  # static / field
+        self.__subroutine_scoop = {}  # arg / var
         self.__counters = {"static": 0, "field": 0, "arg": 0, "var": 0}
 
     def start_subroutine(self):

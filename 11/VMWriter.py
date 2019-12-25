@@ -12,7 +12,7 @@ class VMWriter:
         self.__out.write(command)  # todo lowercase ?
 
     def write_label(self, label):
-        self.__out.write("({0})".format(label))
+        self.__out.write("label {0}".format(label))
 
     def write_goto(self, label):
         self.__out.write("goto {0}".format(label))
