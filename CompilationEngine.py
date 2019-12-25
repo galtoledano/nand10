@@ -197,7 +197,7 @@ class CompilationEngine:
         """
         compiling while loop call
         """
-        self.__output.write("<whileStatement>\n")  # todo whileStatement ?
+        self.__output.write("<whileStatement>\n")
         self.write_xml()  # write while
         self.__tokenizer.advance()
         self.write_xml()  # write (
@@ -220,7 +220,7 @@ class CompilationEngine:
         self.write_xml()  # write return
         self.__tokenizer.advance()
         if self.__tokenizer.get_value() != ";":
-            self.compile_expression()  # todo not writing ;
+            self.compile_expression()
         self.write_xml()  # write ;
         self.__tokenizer.advance()
         self.__output.write("</returnStatement>\n")

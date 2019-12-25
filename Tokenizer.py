@@ -17,6 +17,12 @@ class Tokenizer:
         self.advance()
 
     def remove_comments(self, line, is_comment):
+        """
+        removing comments from command line
+        :param line: the command line
+        :param is_comment: flag to know is we are at comment or not
+        :return: the line with out the comments and the is comment flag
+        """
         # remove comment
         line = line.strip()
         line = line.split("//")[0]
@@ -59,7 +65,6 @@ class Tokenizer:
             return (before_string + the_string + after_string), is_comment
         else:
             return self.remove_comments(line, is_comment)
-
 
     def __read_file(self, original_file):
         """
@@ -194,33 +199,3 @@ class Tokenizer:
         :return: true is it is a operator, flase is not
         """
         return self.__current_token in self.operators
-
-
-     # def __remove_invalid_syntax2(self, line, is_comment):
-     #        """
-     #        removing comments and empty lines from the text file
-     #        :param line: single line to process
-     #        :param is_comment: flag that indicates if the line is at the middle of multi line comment or not
-     #        :return: the processed line and the in multi line comment flag
-     #        """
-     #        # removing comments
-     #        new_line = line.strip()
-     #        new_line = new_line.split("//")[0]
-     #
-     #        # removing multi lines comments
-     #        prefix = new_line[:2]
-     #        suffix = new_line[-2:]
-     #        if prefix == "/*":
-     #            is_comment = True
-     #        elif prefix == "*/":
-     #            new_line = ""
-     #            is_comment = False
-     #        elif suffix == "*/":
-     #            start_len = len(new_line)
-     #            new_line = new_line.split("/*")[0]
-     #            if len(new_line) == start_len:
-     #                new_line = ""
-     #                is_comment = False
-     #        if is_comment:
-     #            new_line = ""
-     #        return new_line, is_comment
