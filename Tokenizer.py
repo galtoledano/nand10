@@ -45,10 +45,10 @@ class Tokenizer:
         # finding string indexing
         start_index = line.find('"')
         comment_index = line.find("//")
+        if comment_index < start_index:
+            return self.remove_comments(line, is_comment)
         if start_index != -1 and not is_comment:
             end_index = line.find('"', start_index + 1, len(line))
-            if comment_index < start_index:
-                return self.remove_comments(line, is_comment)
             before_string = line[:start_index]
             the_string = line[start_index:end_index+1]
             after_string = line[end_index+1:]
