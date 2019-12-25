@@ -1,0 +1,6 @@
+class yahel{
+    filed int x, y;
+    function void gal(int x,int y,int z){
+    let x = 2;
+    }
+}
