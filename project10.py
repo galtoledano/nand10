@@ -8,3 +8,6 @@ file = "test2.jack"
 
 print('"'.endswith('"'))
 print('"'.startswith('"'))
+print("//*ggg".find("/*"))
+x = "//*"
+print(x[1+2:])

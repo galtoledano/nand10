@@ -16,6 +16,25 @@ class Tokenizer:
         self.__read_file(file)
         self.advance()
 
+    def remove_comments(self, line, is_comment):
+        # remove comment
+        line = line.strip()
+        line = line.split("//")[0]
+
+        # remove multi line comments
+        start_index = line.find("/*")
+        if start_index != -1:
+            end_index = line.find("*/")
+            if end_index == -1:
+                return line[:start_index], True
+            return line[:start_index] + line[end_index+2:], False
+        if is_comment:
+            end_index = line.find("*/")
+            if end_index == -1:
+                return "", True
+            return line[end_index+2:], False
+        return line, is_comment
+
     def __remove_invalid_syntax(self, line, is_comment):
         """
         removing comments and empty lines from the text file
@@ -23,21 +42,19 @@ class Tokenizer:
         :param is_comment: flag that indicates if the line is at the middle of multi line comment or not
         :return: the processed line and the in multi line comment flag
         """
-        # removing comments
-        new_line = line.strip()
-        new_line = new_line.split("//")[0]
+        # finding string indexing
+        start_index = line.find('"')
+        if start_index != -1:
+            end_index = line.find('"', start_index + 1, len(line))
+            before_string = line[:start_index]
+            the_string = line[start_index:end_index+1]
+            after_string = line[end_index+1:]
+            before_string, is_comment = self.remove_comments(before_string, is_comment)
+            after_string, is_comment = self.remove_comments(after_string, is_comment)
+            return (before_string + the_string + after_string), is_comment
+        else:
+            return self.remove_comments(line, is_comment)
 
-        # removing multi lines comments
-        prefix = new_line[:2]
-        suffix = new_line[-2:]
-        if prefix == "/*":
-            is_comment = True
-        if prefix == "*/" or suffix == "*/":
-            new_line = ""
-            is_comment = False
-        if is_comment:
-            new_line = ""
-        return new_line, is_comment
 
     def __read_file(self, original_file):
         """
@@ -172,3 +189,33 @@ class Tokenizer:
         :return: true is it is a operator, flase is not
         """
         return self.__current_token in self.operators
+
+
+     # def __remove_invalid_syntax2(self, line, is_comment):
+     #        """
+     #        removing comments and empty lines from the text file
+     #        :param line: single line to process
+     #        :param is_comment: flag that indicates if the line is at the middle of multi line comment or not
+     #        :return: the processed line and the in multi line comment flag
+     #        """
+     #        # removing comments
+     #        new_line = line.strip()
+     #        new_line = new_line.split("//")[0]
+     #
+     #        # removing multi lines comments
+     #        prefix = new_line[:2]
+     #        suffix = new_line[-2:]
+     #        if prefix == "/*":
+     #            is_comment = True
+     #        elif prefix == "*/":
+     #            new_line = ""
+     #            is_comment = False
+     #        elif suffix == "*/":
+     #            start_len = len(new_line)
+     #            new_line = new_line.split("/*")[0]
+     #            if len(new_line) == start_len:
+     #                new_line = ""
+     #                is_comment = False
+     #        if is_comment:
+     #            new_line = ""
+     #        return new_line, is_comment
