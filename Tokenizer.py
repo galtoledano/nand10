@@ -5,6 +5,10 @@ class Tokenizer:
     operators = ("+", "-", "*", "/", "&", "|", "<", ">", "=")
 
     def __init__(self, file):
+        """
+        constructor to tokenizer object
+        :param file: the jack file to convert to tokens
+        """
         self.__file = []
         self.__index = 0
         self.__current_token = None

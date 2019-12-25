@@ -32,6 +32,9 @@ class CompilationEngine:
             self.__output.write(self.XML_LINE.format(self.__tokenizer.token_type(), self.__tokenizer.get_value()))
 
     def compile_class(self):
+        """
+        compiling the program from the class definition
+        """
         self.__output.write("<class>\n")
         self.write_xml()
         self.__tokenizer.advance()
@@ -39,19 +42,22 @@ class CompilationEngine:
         self.__tokenizer.advance()
         self.write_xml()
         self.__tokenizer.advance()
-        currToken = self.__tokenizer.get_value()
-        while currToken == "static" or currToken == "field":
+        current_token = self.__tokenizer.get_value()
+        while current_token == "static" or current_token == "field":
             self.compile_class_var_dec()
-            currToken = self.__tokenizer.get_value()
-        while currToken == "constructor" or currToken == "function" or currToken == "method":
+            current_token = self.__tokenizer.get_value()
+        while current_token == "constructor" or current_token == "function" or current_token == "method":
             self.compile_subroutine_dec()
-            currToken = self.__tokenizer.get_value()
+            current_token = self.__tokenizer.get_value()
         self.write_xml()
         self.__output.write("</class>\n")
 
     def compile_class_var_dec(self):
-        currToken = self.__tokenizer.get_value()
-        while currToken == "static" or currToken == "field":
+        """
+        compiling the program from the class's declaration on vars
+        """
+        current_token = self.__tokenizer.get_value()
+        while current_token == "static" or current_token == "field":
             self.__output.write("<classVarDec>\n")
             self.write_xml()
             self.__tokenizer.advance()
@@ -66,10 +72,13 @@ class CompilationEngine:
                 self.__tokenizer.advance()
             self.write_xml()
             self.__tokenizer.advance()
-            currToken = self.__tokenizer.get_value()
+            current_token = self.__tokenizer.get_value()
             self.__output.write("</classVarDec>\n")
 
     def compile_subroutine_body(self):
+        """
+        compiling the program's subroutine body
+        """
         self.__output.write("<subroutineBody>\n")
         self.write_xml()  # write {
         self.__tokenizer.advance()
@@ -81,6 +90,9 @@ class CompilationEngine:
         self.__output.write("</subroutineBody>\n")
 
     def compile_subroutine_dec(self):
+        """
+        compiling the program's subroutine declaration
+        """
         self.__output.write("<subroutineDec>\n")
         self.write_xml() # write constructor/function/method
         self.__tokenizer.advance()
@@ -93,6 +105,9 @@ class CompilationEngine:
         self.__output.write("</subroutineDec>\n")
 
     def compile_parameter_list(self):
+        """
+        compiling a parameter list
+        """
         self.write_xml()  # write (
         self.__tokenizer.advance()
         self.__output.write("<parameterList>\n")
@@ -113,6 +128,9 @@ class CompilationEngine:
         self.__tokenizer.advance()
 
     def compile_var_dec(self):
+        """
+        compiling function's var declaration
+        """
         self.__output.write("<varDec>\n")
         self.write_xml()  # write var
         self.__tokenizer.advance()
@@ -130,6 +148,9 @@ class CompilationEngine:
         self.__output.write("</varDec>\n")
 
     def compile_statements(self):
+        """
+        compiling statements
+        """
         key = self.__tokenizer.get_value()
         self.__output.write("<statements>\n")
         if key != "}":
@@ -139,6 +160,9 @@ class CompilationEngine:
         self.__output.write("</statements>\n")
 
     def compile_do(self):
+        """
+        compiling do call
+        """
         self.__output.write("<doStatement>\n")
         self.write_xml()  # write do
         self.__tokenizer.advance()
@@ -148,6 +172,9 @@ class CompilationEngine:
         self.__output.write("</doStatement>\n")
 
     def compile_let(self):
+        """
+        compiling let call
+        """
         self.__output.write("<letStatement>\n")
         self.write_xml()  # write let
         self.__tokenizer.advance()
@@ -167,6 +194,9 @@ class CompilationEngine:
         self.__output.write("</letStatement>\n")
 
     def compile_while(self):
+        """
+        compiling while loop call
+        """
         self.__output.write("<whileStatement>\n")  # todo whileStatement ?
         self.write_xml()  # write while
         self.__tokenizer.advance()
@@ -183,6 +213,9 @@ class CompilationEngine:
         self.__output.write("</whileStatement>\n")
 
     def compile_return(self):
+        """
+        compiling return statement
+        """
         self.__output.write("<returnStatement>\n")
         self.write_xml()  # write return
         self.__tokenizer.advance()
@@ -193,6 +226,9 @@ class CompilationEngine:
         self.__output.write("</returnStatement>\n")
 
     def compile_if(self):
+        """
+        compiling if condition
+        """
         self.__output.write("<ifStatement>\n")
         self.write_xml()  # write if
         self.__tokenizer.advance()
@@ -217,6 +253,9 @@ class CompilationEngine:
         self.__output.write("</ifStatement>\n")
 
     def compile_expression(self):
+        """
+        compiling expressions
+        """
         self.__output.write("<expression>\n")
         self.compile_term()
         while self.__tokenizer.is_operator():
@@ -226,6 +265,9 @@ class CompilationEngine:
         self.__output.write("</expression>\n")
 
     def compile_term(self):
+        """
+        compiling any kind of terms
+        """
         # dealing with unknown token
         self.__output.write("<term>\n")
         curr_type = self.__tokenizer.token_type()
@@ -270,6 +312,9 @@ class CompilationEngine:
         self.__output.write("</term>\n")
 
     def subroutine_call(self):
+        """
+        compiling the program's subroutine call
+        """
         if self.__tokenizer.get_next_token() == ".":
             self.write_xml()  # write name
             self.__tokenizer.advance()
@@ -284,6 +329,9 @@ class CompilationEngine:
         self.__tokenizer.advance()
 
     def compile_expression_list(self):
+        """
+        compiling expression list
+        """
         self.__output.write("<expressionList>\n")
         if self.__tokenizer.get_value() != ")":
             self.compile_expression()

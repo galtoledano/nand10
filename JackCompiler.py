@@ -4,6 +4,9 @@ from CompilationEngine import CompilationEngine
 
 
 def main():
+    """
+    the main function, opens the input jack file and convert it to new xml file
+    """
     if len(sys.argv) != 2:
         print('Usage: ', sys.argv[0], '<input file or directory>')
     path = sys.argv[1]
