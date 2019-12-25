@@ -1,6 +1,3 @@
-import os
-
-
 class Tokenizer:
     keyWords = ("class", "constructor", "function", "method", "field", "static", "var", "int", "char",
                 "boolean", "void", "true", "false", "null", "this", "let", "do", "if", "else", "while", "return")
@@ -23,20 +20,20 @@ class Tokenizer:
         :return: the processed line and the in multi line comment flag
         """
         # removing comments
-        newLine = line.strip()
-        newLine = newLine.split("//")[0]
+        new_line = line.strip()
+        new_line = new_line.split("//")[0]
 
         # removing multi lines comments
-        prefix = newLine[:2]
-        suffix = newLine[-2:]
+        prefix = new_line[:2]
+        suffix = new_line[-2:]
         if prefix == "/*":
             is_comment = True
         if prefix == "*/" or suffix == "*/":
-            newLine = ""
+            new_line = ""
             is_comment = False
         if is_comment:
-            newLine = ""
-        return newLine, is_comment
+            new_line = ""
+        return new_line, is_comment
 
     def __read_file(self, original_file):
         """
@@ -59,6 +56,9 @@ class Tokenizer:
         self.find_string()
 
     def find_string(self):
+        """
+        finding a string object and marge it to one object
+        """
         final_file = []
         is_word = False
         temp = ""
@@ -77,19 +77,30 @@ class Tokenizer:
         self.__file = final_file
 
     def get_value(self):
+        """
+        :return: the current token's value
+        """
         return self.__current_token
 
     def has_more_tokens(self):
-        if self.__index != len(self.__file):
-            return True
+        """
+        :return: return True if there is  more tokens to process left, false otherwise
+        """
+        return self.__index != len(self.__file)
 
     def advance(self):
+        """
+        advance to the next token at the program
+        """
         if self.has_more_tokens():
             self.__current_token = self.__file[self.__index]
             self.__current_token_type = self.token_type()
             self.__index += 1
 
     def token_type(self):
+        """
+        :return: the current token's type
+        """
         # returns the token's type.
         if self.__current_token in self.keyWords:
             return "keyword"
