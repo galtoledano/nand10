@@ -45,7 +45,9 @@ class Tokenizer:
         # finding string indexing
         start_index = line.find('"')
         comment_index = line.find("//")
-        if comment_index < start_index:
+        difrent_comment_index = line.find("/*")
+        if (comment_index != -1 and comment_index < start_index) \
+                or (difrent_comment_index < start_index and difrent_comment_index != -1):
             return self.remove_comments(line, is_comment)
         if start_index != -1 and not is_comment:
             end_index = line.find('"', start_index + 1, len(line))
